@@ -1,0 +1,62 @@
+{
+    "name": "amarenkov/laravel-mutable-content-ai",
+    "description": "AI agents for laravel-mutable-content apps: long-term memory and a run journal with conversation history for laravel/ai agents.",
+    "type": "library",
+    "keywords": [
+        "laravel",
+        "eloquent",
+        "ai",
+        "llm",
+        "agents",
+        "memory",
+        "tool-calling",
+        "dynamic-fields"
+    ],
+    "homepage": "https://github.com/amarenkov/laravel-mutable-content-ai",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alexey Marenkov",
+            "email": "alex@marenkov.dev",
+            "homepage": "https://github.com/amarenkov"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/amarenkov/laravel-mutable-content-ai/issues",
+        "source": "https://github.com/amarenkov/laravel-mutable-content-ai"
+    },
+    "require": {
+        "php": "^8.4",
+        "amarenkov/laravel-mutable-content": "^0.7.6",
+        "laravel/ai": "^1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Amarenkov\\MutableContentAi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Amarenkov\\MutableContentAi\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Amarenkov\\MutableContentAi\\MutableContentAiServiceProvider"
+            ]
+        },
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "require-dev": {
+        "orchestra/testbench": "^11.0",
+        "phpunit/phpunit": "^12.0",
+        "larastan/larastan": "^3.0"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse"
+    }
+}

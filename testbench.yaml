@@ -1,0 +1,4 @@
+providers:
+  - Amarenkov\MutableContent\MutableContentServiceProvider
+  - Laravel\Ai\AiServiceProvider
+  - Amarenkov\MutableContentAi\MutableContentAiServiceProvider
