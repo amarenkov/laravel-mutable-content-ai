@@ -64,7 +64,20 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
   error. `history()` replays recent completed runs of the conversation as agent messages **with the tool calls**:
   an agent that sees only its past answers tends to imitate them in words instead of calling the tools.
   `countSince()` counts runs of a user, for daily limits.
-- Models with mutable fields (`Memory`, `Run`) in the `ai` schema: every change lands in the core change log with
+- **Approvals.** A tool implementing `NeedsApproval` with the `AsksForApproval` trait does not act when its
+  `approvalSummary()` describes the call: it keeps an `Approval` (tool, arguments, what it will do) and tells the
+  model the action waits. The application shows it to the user; `Approvals::approve($approval, $tool)` performs the
+  action with the saved arguments without asking the model again, `reject()` declines it. The outcome is added to the
+  tool result in the run journal. `Forget` asks for approval when given an `Approvals` instance.
+- **Prompts.** `Prompts::register($code, $label, $default, $placeholders)` in the code,
+  `Prompts::render($code, $values)` in an agent, `Prompts::save($code, $text, $user)` from a screen of the application.
+  An empty or default text returns the prompt to the default; `history()` gives the versions from the core change log.
+- **Tool schemas from fields.** `FieldSchema::for(Model::class)->only([...])->describe([...])->build($schema)` turns
+  field definitions into tool parameters: LOV items become enums with their labels, object references record numbers,
+  dates strings in a stated format, required flags come from the field usage; `values($arguments)` turns the arguments
+  back into field values. `FindRecords` is a ready search tool over a query the application gives, by words of a title
+  field and by field filters.
+- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`) in the `ai` schema: every change lands in the core change log with
   its author, an application may add its own fields.
 - **No user interface.** Screens, bots and access rules belong to the application.
 

@@ -7,9 +7,12 @@ use Illuminate\Support\ServiceProvider;
 use Amarenkov\MutableContent\Domain\LovRegistry;
 use Amarenkov\MutableContent\Domain\MutableClassRegistry;
 
+use Amarenkov\MutableContentAi\Lovs\ApprovalStatus;
 use Amarenkov\MutableContentAi\Lovs\MemoryKind;
 use Amarenkov\MutableContentAi\Lovs\RunStatus;
+use Amarenkov\MutableContentAi\Models\Approval;
 use Amarenkov\MutableContentAi\Models\Memory;
+use Amarenkov\MutableContentAi\Models\Prompt;
 use Amarenkov\MutableContentAi\Models\Run;
 
 class MutableContentAiServiceProvider extends ServiceProvider
@@ -24,13 +27,16 @@ class MutableContentAiServiceProvider extends ServiceProvider
         $this->callAfterResolving(MutableClassRegistry::class, function (MutableClassRegistry $registry) {
             $registry
                 ->add(Memory::class)
-                ->add(Run::class);
+                ->add(Run::class)
+                ->add(Approval::class)
+                ->add(Prompt::class);
         });
 
         $this->callAfterResolving(LovRegistry::class, function (LovRegistry $registry) {
             $registry
                 ->addClass(MemoryKind::class)
-                ->addClass(RunStatus::class);
+                ->addClass(RunStatus::class)
+                ->addClass(ApprovalStatus::class);
         });
     }
 

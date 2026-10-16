@@ -9,6 +9,7 @@ use Laravel\Ai\Contracts\Conversational;
 use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Promptable;
 
+use Amarenkov\MutableContentAi\Services\Approvals;
 use Amarenkov\MutableContentAi\Services\Memories;
 use Amarenkov\MutableContentAi\Services\Runs;
 use Amarenkov\MutableContentAi\Tools\Forget;
@@ -24,6 +25,7 @@ class Helper implements Agent, Conversational, HasTools
     public function __construct(
         public User $user,
         public ?string $conversation = null,
+        public bool $confirm = false,
     )
     {
     }
@@ -45,6 +47,6 @@ class Helper implements Agent, Conversational, HasTools
 
     public function tools(): iterable
     {
-        return [new Remember($this->user), new Forget($this->user)];
+        return [new Remember($this->user), new Forget($this->user, $this->confirm ? Approvals::of($this->user, $this->conversation) : null)];
     }
 }

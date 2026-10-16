@@ -28,7 +28,7 @@ class MemoriesTest extends TestCase
         $this->assertSame([$alias->id, $fact->id], $memories->all()->pluck('id')->all());
 
         $this->assertSame(
-            "What you remember about the user (number, kind, text):\n#{$alias->id} (alias) Pete is @petrov\n#{$fact->id} (fact) Works from 10 to 19",
+            "What you remember about the user now (number, kind, text); this list is current and beats anything said earlier in the conversation:\n#{$alias->id} (alias) Pete is @petrov\n#{$fact->id} (fact) Works from 10 to 19",
             $memories->prompt(),
         );
 

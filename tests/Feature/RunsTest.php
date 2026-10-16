@@ -77,6 +77,8 @@ class RunsTest extends TestCase
         $this->assertSame(['Second', 'Two'], array_map(fn ($message) => $message->content, $second->runs()->history()));
         $this->assertSame([], new Helper($this->user)->runs()->history());
         $this->assertSame(3, $first->runs()->countSince(now()->startOfDay()));
+        $this->assertSame(3, $first->runs()->countSince(now()->subMinute()->setTimezone('Asia/Vladivostok')));
+        $this->assertSame(0, $first->runs()->countSince(now()->addMinute()->setTimezone('America/New_York')));
 
         $this->travel(3)->hours();
 

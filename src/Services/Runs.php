@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Throwable;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 use Laravel\Ai\Contracts\Agent;
@@ -95,7 +96,11 @@ class Runs
     {
     }
 
-    public function record(string $prompt, AgentResponse $response, ?int $durationMs = null): Run
+    /**
+     * Keep a completed run. The answer may be replaced: what the model said is not always what happened (it says
+     * "done" about an action that waits for approval), and the history must not repeat it.
+     */
+    public function record(string $prompt, AgentResponse $response, ?int $durationMs = null, ?string $answer = null): Run
     {
         $results = $response->toolResults->keyBy(fn (ToolResult $result) => $result->resultId ?? $result->id);
 
@@ -111,10 +116,10 @@ class Runs
             ];
         })->values()->all();
 
-        return $this->save([
+        $run = $this->save([
             Run::FIELD_STATUS => RunStatus::COMPLETED,
             Run::FIELD_PROMPT => $prompt,
-            Run::FIELD_ANSWER => $response->text,
+            Run::FIELD_ANSWER => $answer ?? $response->text,
             Run::FIELD_TOOL_CALLS => $calls ? json_encode($calls, JSON_UNESCAPED_UNICODE) : null,
             Run::FIELD_PROVIDER => $response->meta->provider,
             Run::FIELD_MODEL => $response->meta->model,
@@ -122,6 +127,10 @@ class Runs
             Run::FIELD_OUTPUT_TOKENS => $response->usage->outputTokens,
             Run::FIELD_DURATION_MS => $durationMs,
         ]);
+
+        Approvals::of($this->userId, $this->conversation)->attach($run);
+
+        return $run;
     }
 
     public function failed(string $prompt, Throwable|string $error, ?int $durationMs = null): Run
@@ -161,10 +170,12 @@ class Runs
     }
 
     /**
-     * Runs of the user with any agent since the moment: for daily limits.
+     * Runs of the user with any agent since the moment in any timezone: for daily limits.
      */
     public function countSince(DateTimeInterface $since): int
     {
+        $since = Carbon::instance($since)->setTimezone(config('app.timezone'));
+
         return Run::query()->ownedBy($this->userId)->where('created_at', '>=', $since)->count();
     }
 }
