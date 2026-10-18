@@ -48,6 +48,9 @@ class FieldSchema
     /** @var array<string, string> */
     protected array $descriptions = [];
 
+    /** @var array<string, array<string>> */
+    protected array $allowed = [];
+
     /**
      * @return array<string, Field>
      */
@@ -78,7 +81,9 @@ class FieldSchema
      */
     protected function lovItems(Field $field): array
     {
-        return $field->lovCode ? app(LovRegistry::class)->getLovItemsOptions($field->lovCode) : [];
+        $items = $field->lovCode ? app(LovRegistry::class)->getLovItemsOptions($field->lovCode) : [];
+
+        return isset($this->allowed[$field->code]) ? array_intersect_key($items, array_flip($this->allowed[$field->code])) : $items;
     }
 
     protected function description(Field $field): string
@@ -158,6 +163,18 @@ class FieldSchema
     public function describe(array $descriptions): static
     {
         $this->descriptions = $descriptions + $this->descriptions;
+
+        return $this;
+    }
+
+    /**
+     * Only these LOV items of a field, for a tool that must not offer the others.
+     *
+     * @param array<string> $codes
+     */
+    public function allow(string $field, array $codes): static
+    {
+        $this->allowed[$field] = $codes;
 
         return $this;
     }

@@ -14,6 +14,6 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Remember` and `Forget` agent tools.
 - `Approval` (the `ai_approval_status` LOV), `Approvals::of($user, $conversation)` service (`request()`, `find()`, `approve()` performing the action by its tool, `reject()`, `attach()` to a run), the `NeedsApproval` contract and the `AsksForApproval` trait for tools; `Forget` asks for approval when given approvals.
 - `Prompt` and `Prompts` service: prompts registered in the code with a default text and placeholders, edited texts, versions from the core change log.
-- `FieldSchema`: tool parameters from field definitions and field values from tool arguments; `FindRecords` search tool; `TextSearch` loose word matching.
+- `FieldSchema`: tool parameters from field definitions (`allow()` limits the LOV items offered) and field values from tool arguments; `FindRecords` search tool; `TextSearch` loose word matching.
 
 [Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/commits/main

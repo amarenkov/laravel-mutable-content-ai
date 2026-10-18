@@ -39,6 +39,11 @@ class SchemasTest extends TestCase
         $this->assertSame('Kind. alias - Alias, fact - Fact, preference - Preference', $schema[Memory::FIELD_KIND]['description']);
         $this->assertSame('Text. One sentence', $schema[Memory::FIELD_TEXT]['description']);
 
+        $only = FieldSchema::for(Memory::class)->only([Memory::FIELD_KIND])->allow(Memory::FIELD_KIND, [MemoryKind::FACT, MemoryKind::ALIAS]);
+
+        $this->assertSame([MemoryKind::ALIAS, MemoryKind::FACT], $this->schema($only)[Memory::FIELD_KIND]['enum']);
+        $this->assertSame([], $only->values([Memory::FIELD_KIND => MemoryKind::PREFERENCE]));
+
         $run = $this->schema(FieldSchema::for(Run::class)->only([Run::FIELD_INPUT_TOKENS, Run::FIELD_PROMPT])->required([Run::FIELD_PROMPT], false));
 
         $this->assertSame('integer', $run[Run::FIELD_INPUT_TOKENS]['type']);
