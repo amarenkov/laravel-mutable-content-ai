@@ -33,5 +33,11 @@
     "Arguments": "Аргументы",
     "Summary": "Что будет сделано",
     "Result": "Результат",
-    "Code": "Код"
+    "Code": "Код",
+    "AI settings": "Настройки ИИ",
+    "Enabled": "Включено",
+    "Driver": "Драйвер",
+    "API URL": "Адрес API",
+    "API key": "Ключ API",
+    "Daily limit": "Дневной лимит"
 }

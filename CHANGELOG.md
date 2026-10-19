@@ -7,6 +7,14 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- User settings (`Models\Settings`, table `ai.settings` in the new migration `extend_ai_tables_with_settings`): the driver, the API URL, the API key as a `secret` field, the model, the daily limit and an on/off switch of a user. `Services\UserSettings`: `save()` (an empty key keeps the stored one), `forgetApiKey()`, `isReady()`, `model()`, `dailyLimit()`, `usedToday()`, `withinDailyLimit()`, `providerConfig()` and `provider()` - the name of a laravel/ai provider built from the settings, for the `provider()` method of an agent. Config `settings.driver` (`openai-compatible`).
+
+### Changed
+
+- Requires `amarenkov/laravel-mutable-content` ^0.7.9 (the `secret` field type).
+
 ## [0.1.0] - 2026-10-19
 
 First release, very early: the API, the tables and the config will change.

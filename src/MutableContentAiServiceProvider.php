@@ -14,6 +14,7 @@ use Amarenkov\MutableContentAi\Models\Approval;
 use Amarenkov\MutableContentAi\Models\Memory;
 use Amarenkov\MutableContentAi\Models\Prompt;
 use Amarenkov\MutableContentAi\Models\Run;
+use Amarenkov\MutableContentAi\Models\Settings;
 
 class MutableContentAiServiceProvider extends ServiceProvider
 {
@@ -29,7 +30,8 @@ class MutableContentAiServiceProvider extends ServiceProvider
                 ->add(Memory::class)
                 ->add(Run::class)
                 ->add(Approval::class)
-                ->add(Prompt::class);
+                ->add(Prompt::class)
+                ->add(Settings::class);
         });
 
         $this->callAfterResolving(LovRegistry::class, function (LovRegistry $registry) {

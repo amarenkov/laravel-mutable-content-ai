@@ -8,6 +8,10 @@ return [
         'max_length' => 500,
     ],
 
+    'settings' => [
+        'driver' => 'openai-compatible',
+    ],
+
     'history' => [
         'runs' => 10,
         'minutes' => 120,

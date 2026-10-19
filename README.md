@@ -83,7 +83,12 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
   dates strings in a stated format, required flags come from the field usage; `values($arguments)` turns the arguments
   back into field values. `FindRecords` is a ready search tool over a query the application gives, by words of a title
   field and by field filters.
-- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`) in the `ai` schema: every change lands in the core change log with
+- **User settings.** Each user brings an own provider: `UserSettings::of($user)->save([...])` keeps the driver, the
+  API URL, the API key (a `secret` field: encrypted, an empty value keeps the stored key, `forgetApiKey()` removes
+  it), the model, the daily limit and an on/off switch. `isReady()` - enabled and has a key; `withinDailyLimit()`
+  counts today's runs. An agent runs on the user's provider by returning `UserSettings::of($this->user)->provider()`
+  from its `provider()` method: a laravel/ai provider built from the settings in the current process.
+- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`, `Settings`) in the `ai` schema: every change lands in the core change log with
   its author, an application may add its own fields.
 - **No user interface.** Screens, bots and access rules belong to the application.
 
@@ -92,7 +97,7 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
 - PHP 8.4
 - Laravel 13
 - PostgreSQL or MariaDB 10.7+ (not SQLite, not MySQL), as the core
-- `amarenkov/laravel-mutable-content` ^0.7.6, `laravel/ai` ^1.2
+- `amarenkov/laravel-mutable-content` ^0.7.9, `laravel/ai` ^1.2
 
 ## Installation
 
@@ -103,7 +108,7 @@ php artisan migrate
 ```
 
 Then seed the core LOVs and fields as usual (`LovsSeeder`, `FieldsSeeder`). The config
-(`--tag=mutable-content-ai-config`) sets the user model, the memory limits and the history window.
+(`--tag=mutable-content-ai-config`) sets the user model, the default driver of user settings, the memory limits and the history window.
 
 ## License
 
