@@ -1,6 +1,12 @@
 # amarenkov/laravel-mutable-content-ai
 
-> **Work in progress.** Not released yet: the API may change.
+[![tests](https://github.com/amarenkov/laravel-mutable-content-ai/actions/workflows/tests.yml/badge.svg)](https://github.com/amarenkov/laravel-mutable-content-ai/actions/workflows/tests.yml)
+[![Packagist](https://img.shields.io/packagist/v/amarenkov/laravel-mutable-content-ai)](https://packagist.org/packages/amarenkov/laravel-mutable-content-ai)
+![coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)
+
+> **Very early, expect breaking changes.** The package was extracted from a single application and is used only
+> there so far. Models, tables, the config and the API will change between minor versions, and an upgrade may need
+> manual steps. Pin an exact version if you try it.
 
 AI agents for [`amarenkov/laravel-mutable-content`](https://github.com/amarenkov/laravel-mutable-content) apps,
 built on [`laravel/ai`](https://github.com/laravel/ai): a long-term memory of each user and a journal of agent runs
