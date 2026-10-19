@@ -39,5 +39,14 @@
     "Driver": "Драйвер",
     "API URL": "Адрес API",
     "API key": "Ключ API",
-    "Daily limit": "Дневной лимит"
+    "Daily limit": "Дневной лимит",
+    "Feedback": "Отзыв",
+    "Feedback status": "Статус отзыва",
+    "New": "Новый",
+    "Resolved": "Разобран",
+    "Source": "Источник",
+    "Reaction": "Реакция",
+    "Message": "Сообщение",
+    "Context": "Контекст",
+    "Note": "Заметка"
 }

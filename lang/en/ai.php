@@ -26,4 +26,5 @@ return [
     'find_text' => 'Words from the title; empty - the latest records',
     'found_nothing' => 'Nothing found.',
     'found' => 'Found: :total, showing :count:',
+    'feedback_not_found' => 'There is no such feedback.',
 ];

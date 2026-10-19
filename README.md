@@ -88,7 +88,11 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
   it), the model, the daily limit and an on/off switch. `isReady()` - enabled and has a key; `withinDailyLimit()`
   counts today's runs. An agent runs on the user's provider by returning `UserSettings::of($this->user)->provider()`
   from its `provider()` method: a laravel/ai provider built from the settings in the current process.
-- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`, `Settings`) in the `ai` schema: every change lands in the core change log with
+- **Feedback.** `Feedbacks::of($user)->add($reaction, $message, $run, $context, $source)` keeps a user's mark on an
+  agent message - a thumbs down in a chat - with the conversation around it and the run that produced it, to review
+  later and correct the prompts. One feedback per source (the application's key of the message), `withdraw($source)`
+  removes a new one when the mark is taken back; `resolve($feedback, $note)`, `reopen()` and `note()` track the review.
+- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`, `Settings`, `Feedback`) in the `ai` schema: every change lands in the core change log with
   its author, an application may add its own fields.
 - **No user interface.** Screens, bots and access rules belong to the application.
 

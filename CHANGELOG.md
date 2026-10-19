@@ -7,6 +7,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Feedback on agent messages (`Models\Feedback`, table `ai.feedback` in the new migration `extend_ai_tables_with_feedback`, the `ai_feedback_status` LOV): the reaction, the marked message, the conversation around it and the run. `Services\Feedbacks`: `add()` (one feedback per source, a new reaction replaces the old one), `withdraw()`, `find()`, `resolve()`, `reopen()`, `note()`, `delete()`.
+
 ## [0.2.0] - 2026-10-19
 
 ### Added
