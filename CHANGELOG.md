@@ -7,6 +7,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-19
+
 ### Added
 
 - Feedback on agent messages (`Models\Feedback`, table `ai.feedback` in the new migration `extend_ai_tables_with_feedback`, the `ai_feedback_status` LOV): the reaction, the marked message, the conversation around it and the run. `Services\Feedbacks`: `add()` (one feedback per source, a new reaction replaces the old one), `withdraw()`, `find()`, `resolve()`, `reopen()`, `note()`, `delete()`.
@@ -34,6 +36,7 @@ First release, very early: the API, the tables and the config will change.
 - `Prompt` and `Prompts` service: prompts registered in the code with a default text and placeholders, edited texts, versions from the core change log.
 - `FieldSchema`: tool parameters from field definitions (`allow()` limits the LOV items offered) and field values from tool arguments; `FindRecords` search tool; `TextSearch` loose word matching.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/amarenkov/laravel-mutable-content-ai/releases/tag/v0.1.0
