@@ -7,6 +7,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-19
+
+First release, very early: the API, the tables and the config will change.
+
 ### Added
 
 - `Memory` (a user's fact, preference or alias, the `ai_memory_kind` LOV) and `Memories::of($user)` service: `remember()`, `forget()`, `all()`, `prompt()`, limits in the config.
@@ -16,4 +20,5 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Prompt` and `Prompts` service: prompts registered in the code with a default text and placeholders, edited texts, versions from the core change log.
 - `FieldSchema`: tool parameters from field definitions (`allow()` limits the LOV items offered) and field values from tool arguments; `FindRecords` search tool; `TextSearch` loose word matching.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/commits/main
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/amarenkov/laravel-mutable-content-ai/releases/tag/v0.1.0
