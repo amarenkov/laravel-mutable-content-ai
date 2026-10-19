@@ -19,13 +19,15 @@ use Amarenkov\MutableContent\Attributes\FieldAttr\Common\Label as CFALabel;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsRequired as CFAIsRequired;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsImmutable as CFAIsImmutable;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\LovCode as CFALovCode;
+use Amarenkov\MutableContent\Attributes\FieldAttr\Common\ObjectClass as CFAObjectClass;
 
 use Amarenkov\MutableContentAi\Lovs\RunStatus;
 use Amarenkov\MutableContentAi\Support\Users;
 
 /**
  * One prompt to an agent: the user's message, the tool calls with their results, the answer, the model and the tokens.
- * Runs of one conversation are its history for the next prompt.
+ * Runs of one conversation are its history for the next prompt. The run is paid by the owner of the settings it used:
+ * the user, or the owner of a grant (an old run without a payer is paid by its user).
  */
 #[Table('ai.runs')]
 #[ClassLabel('Agent run')]
@@ -72,6 +74,12 @@ class Run extends ModelWithFields
     #[CFAType(Type::TYPE_INT), CFALabel('Duration, ms')]
     public const FIELD_DURATION_MS = 'duration_ms';
 
+    #[CFAType(Type::TYPE_INT), CFALabel('Paid by'), CFAIsImmutable]
+    public const FIELD_PAYER_ID = 'payer_id';
+
+    #[CFAType(Type::TYPE_OBJECT), CFALabel('Grant'), CFAObjectClass(Grant::class), CFAIsImmutable]
+    public const FIELD_GRANT_ID = 'grant_id';
+
     // static
     protected static array|bool|null $fieldDefinitions = null;
 
@@ -79,6 +87,18 @@ class Run extends ModelWithFields
     public function scopeOwnedBy(Builder $query, Authenticatable|int $user): Builder
     {
         return $query->whereField(self::FIELD_USER_ID, $user instanceof Authenticatable ? $user->getAuthIdentifier() : $user);
+    }
+
+    /**
+     * Runs on the user's settings: own and through the user's grants.
+     */
+    public function scopePaidBy(Builder $query, Authenticatable|int $user): Builder
+    {
+        $userId = $user instanceof Authenticatable ? $user->getAuthIdentifier() : $user;
+
+        return $query->where(fn (Builder $query) => $query
+            ->whereField(self::FIELD_PAYER_ID, $userId)
+            ->orWhere(fn (Builder $query) => $query->whereNull(self::FIELD_PAYER_ID)->whereField(self::FIELD_USER_ID, $userId)));
     }
 
     public function scopeInConversation(Builder $query, string $conversation): Builder
@@ -89,6 +109,19 @@ class Run extends ModelWithFields
     public function user(): BelongsTo
     {
         return $this->belongsTo(Users::model(), self::FIELD_USER_ID);
+    }
+
+    public function payer(): BelongsTo
+    {
+        return $this->belongsTo(Users::model(), self::FIELD_PAYER_ID);
+    }
+
+    /**
+     * @return BelongsTo<Grant, $this>
+     */
+    public function grant(): BelongsTo
+    {
+        return $this->belongsTo(Grant::class, self::FIELD_GRANT_ID)->withTrashed();
     }
 
     /**

@@ -7,6 +7,15 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Shared settings (`Models\Grant`, table `ai.grants` in the new migration `extend_ai_tables_with_grants`): a user lets another user, or everybody in a conversation, run agents on the user's settings - in a conversation and the nested ones or everywhere, with an optional daily limit of the grant. `Services\Grants`: `give()`, `moveTo()`, `setDailyLimit()`, `revoke()`, `find()`, `query()`, `usedToday()`, `withinDailyLimit()`. `Services\Access::for($user, $conversation)` picks whose settings to use: own ready ones first, then a grant.
+- The payer and the grant of a run (`Run::FIELD_PAYER_ID`, `Run::FIELD_GRANT_ID`, scope `paidBy()`), written by `Runs::using($access)`.
+
+### Changed
+
+- `UserSettings::usedToday()` counts the runs paid by the user: own and through the user's grants. Run `FieldsSeeder` after the migration.
+
 ## [0.3.0] - 2026-10-19
 
 ### Added

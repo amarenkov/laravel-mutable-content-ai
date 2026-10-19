@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 
 use Laravel\Ai\Ai;
 
+use Amarenkov\MutableContentAi\Models\Run;
 use Amarenkov\MutableContentAi\Models\Settings;
 
 /**
@@ -102,11 +103,11 @@ class UserSettings
     }
 
     /**
-     * Runs of the user with any agent today, in the application timezone.
+     * Runs on the settings with any agent today, in the application timezone: the user's own and through the grants.
      */
     public function usedToday(): int
     {
-        return Runs::for($this->userId, '')->countSince(Carbon::now(config('app.timezone'))->startOfDay());
+        return Run::query()->paidBy($this->userId)->where('created_at', '>=', Carbon::now(config('app.timezone'))->startOfDay())->count();
     }
 
     public function withinDailyLimit(): bool

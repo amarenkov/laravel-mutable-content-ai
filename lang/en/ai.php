@@ -27,4 +27,8 @@ return [
     'found_nothing' => 'Nothing found.',
     'found' => 'Found: :total, showing :count:',
     'feedback_not_found' => 'There is no such feedback.',
+    'grant_not_found' => 'No such grant.',
+    'grant_to_nobody' => 'A grant is given to a user, to a conversation or to both.',
+    'grant_to_owner' => 'The owner uses the settings anyway.',
+    'grant_wrong_limit' => 'The daily limit is a whole number above zero.',
 ];

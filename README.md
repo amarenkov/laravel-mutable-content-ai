@@ -92,7 +92,14 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
   agent message - a thumbs down in a chat - with the conversation around it and the run that produced it, to review
   later and correct the prompts. One feedback per source (the application's key of the message), `withdraw($source)`
   removes a new one when the mark is taken back; `resolve($feedback, $note)`, `reopen()` and `note()` track the review.
-- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`, `Settings`, `Feedback`) in the `ai` schema: every change lands in the core change log with
+- **Shared settings.** `Grants::of($owner)->give($user, 'telegram:15', 20)` lets another user run agents on the
+  owner's settings in a conversation (and the nested ones: `telegram:15` covers `telegram:15:7`) with an own daily
+  limit; `give($user)` - everywhere, as if the settings were the user's; `give(null, 'telegram:15')` - everybody in the
+  conversation. `moveTo()`, `setDailyLimit()`, `revoke()`. `Access::for($user, $conversation)` picks the settings: own
+  ready ones first, then a grant within its limit and the owner's; the agent returns `$access->provider()` and the
+  journal keeps the payer and the grant (`Runs::for(...)->using($access)`), so the owner's daily limit counts the runs
+  of everybody on the owner's key.
+- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`, `Settings`, `Feedback`, `Grant`) in the `ai` schema: every change lands in the core change log with
   its author, an application may add its own fields.
 - **No user interface.** Screens, bots and access rules belong to the application.
 

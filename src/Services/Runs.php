@@ -24,6 +24,7 @@ use Amarenkov\MutableContentAi\Models\Run;
 /**
  * The run journal of an agent for one user, optionally within one conversation (a chat, a thread, a page):
  * Runs::for($user, $agent, 'telegram:15')->record($prompt, $response) / failed() / history() / countSince().
+ * Runs through somebody else's settings are paid by their owner: Runs::for(...)->using(Access::for($user, ...)).
  *
  * The history replays earlier runs with their tool calls and results: an agent that sees only past answers tends to
  * imitate them in words instead of calling the tools.
@@ -41,6 +42,8 @@ class Runs
     }
 
     // protected
+    protected ?Access $access = null;
+
     protected function save(array $fields): Run
     {
         $run = new Run();
@@ -48,6 +51,8 @@ class Runs
             Run::FIELD_USER_ID => $this->userId,
             Run::FIELD_AGENT => $this->agent,
             Run::FIELD_CONVERSATION => $this->conversation,
+            Run::FIELD_PAYER_ID => $this->access?->payerId() ?? $this->userId,
+            Run::FIELD_GRANT_ID => $this->access?->grant?->id,
         ] + array_filter($fields, fn ($value) => $value !== null && $value !== ''));
         $run->withLogContext()->user($this->userId);
         $run->save();
@@ -94,6 +99,16 @@ class Runs
         public readonly ?string $conversation = null,
     )
     {
+    }
+
+    /**
+     * Whose settings the runs use: the payer and the grant are kept in each run.
+     */
+    public function using(?Access $access): self
+    {
+        $this->access = $access;
+
+        return $this;
     }
 
     /**
