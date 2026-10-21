@@ -8,10 +8,12 @@ use Amarenkov\MutableContent\Domain\LovRegistry;
 use Amarenkov\MutableContent\Domain\MutableClassRegistry;
 
 use Amarenkov\MutableContentAi\Lovs\ApprovalStatus;
+use Amarenkov\MutableContentAi\Lovs\BalanceEntryKind;
 use Amarenkov\MutableContentAi\Lovs\FeedbackStatus;
 use Amarenkov\MutableContentAi\Lovs\MemoryKind;
 use Amarenkov\MutableContentAi\Lovs\RunStatus;
 use Amarenkov\MutableContentAi\Models\Approval;
+use Amarenkov\MutableContentAi\Models\BalanceEntry;
 use Amarenkov\MutableContentAi\Models\Feedback;
 use Amarenkov\MutableContentAi\Models\Grant;
 use Amarenkov\MutableContentAi\Models\Memory;
@@ -36,7 +38,8 @@ class MutableContentAiServiceProvider extends ServiceProvider
                 ->add(Prompt::class)
                 ->add(Settings::class)
                 ->add(Feedback::class)
-                ->add(Grant::class);
+                ->add(Grant::class)
+                ->add(BalanceEntry::class);
         });
 
         $this->callAfterResolving(LovRegistry::class, function (LovRegistry $registry) {
@@ -44,7 +47,8 @@ class MutableContentAiServiceProvider extends ServiceProvider
                 ->addClass(MemoryKind::class)
                 ->addClass(RunStatus::class)
                 ->addClass(ApprovalStatus::class)
-                ->addClass(FeedbackStatus::class);
+                ->addClass(FeedbackStatus::class)
+                ->addClass(BalanceEntryKind::class);
         });
     }
 

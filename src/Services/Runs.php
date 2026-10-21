@@ -140,6 +140,8 @@ class Runs
             Run::FIELD_MODEL => $response->meta->model,
             Run::FIELD_INPUT_TOKENS => $response->usage->inputTokens,
             Run::FIELD_OUTPUT_TOKENS => $response->usage->outputTokens,
+            Run::FIELD_CACHE_READ_TOKENS => $response->usage->cacheReadInputTokens,
+            Run::FIELD_CACHE_WRITE_TOKENS => $response->usage->cacheWriteInputTokens,
             Run::FIELD_DURATION_MS => $durationMs,
         ]);
 

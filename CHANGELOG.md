@@ -7,6 +7,12 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The tokens read from and written to a prompt cache in the run journal (`Run::FIELD_CACHE_READ_TOKENS`, `Run::FIELD_CACHE_WRITE_TOKENS`), written by `Runs::record()`.
+- Costs of runs by the model prices of the new `prices` config key, in the provider's currency, with separate cache prices: `Services\Costs`, `Run::cost()`. `Services\Spending`: `runs()`, `total()` and `daily()` sum the runs paid by a user by currency and by model.
+- The estimated balance on the provider account (`Models\BalanceEntry`, table `ai.balance_entries` in the new migration `extend_ai_tables_with_balance`, the `ai_balance_entry_kind` LOV). `Services\Balances`: `topUp()`, `setActual()`, `remaining()` - the latest actual balance plus the top-ups minus the costs after it, `entries()`, `find()`, `delete()`. Run `LovsSeeder` and `FieldsSeeder` after the migration.
+
 ## [0.4.0] - 2026-10-19
 
 ### Added

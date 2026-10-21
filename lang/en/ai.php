@@ -31,4 +31,6 @@ return [
     'grant_to_nobody' => 'A grant is given to a user, to a conversation or to both.',
     'grant_to_owner' => 'The owner uses the settings anyway.',
     'grant_wrong_limit' => 'The daily limit is a whole number above zero.',
+    'top_up_not_positive' => 'A top-up is an amount above zero.',
+    'balance_entry_not_found' => 'There is no such balance entry.',
 ];

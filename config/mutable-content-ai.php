@@ -12,6 +12,8 @@ return [
         'driver' => 'openai-compatible',
     ],
 
+    'prices' => [],
+
     'history' => [
         'runs' => 10,
         'minutes' => 120,

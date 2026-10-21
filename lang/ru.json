@@ -52,5 +52,13 @@
     "AI grant": "Доступ к ИИ",
     "User": "Пользователь",
     "Paid by": "Оплачивает",
-    "Grant": "Доступ"
+    "Grant": "Доступ",
+    "Cache read tokens": "Токены из кэша",
+    "Cache write tokens": "Токены в кэш",
+    "Balance entry": "Запись баланса",
+    "Balance entry kind": "Вид записи баланса",
+    "Top-up": "Пополнение",
+    "Actual balance": "Фактический остаток",
+    "Amount": "Сумма",
+    "Date": "Дата"
 }

@@ -99,7 +99,14 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
   ready ones first, then a grant within its limit and the owner's; the agent returns `$access->provider()` and the
   journal keeps the payer and the grant (`Runs::for(...)->using($access)`), so the owner's daily limit counts the runs
   of everybody on the owner's key.
-- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`, `Settings`, `Feedback`, `Grant`) in the `ai` schema: every change lands in the core change log with
+- **Costs and balance.** The journal keeps the tokens read from and written to a prompt cache. With the prices of
+  `mutable-content-ai.prices` (per model, per million tokens, in the provider's currency:
+  `'claude-haiku-5-5' => ['currency' => 'USD', 'input' => 0.1, 'output' => 0.5, 'cache_read' => 0.01, 'cache_write' => 0.125]`)
+  `$run->cost()` is the cost of a run, `Spending::of($user)->total($from, $to)` and `daily($from)` sum the runs paid by
+  the user by currency and by model. Providers do not tell the balance by the API key, so `Balances::of($user)` estimates it:
+  `topUp($money)` and `setActual($money)` (the balance seen at the provider) keep entries, `remaining()` is the latest
+  actual balance of each currency plus the top-ups after it minus the costs after it.
+- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`, `Settings`, `Feedback`, `Grant`, `BalanceEntry`) in the `ai` schema: every change lands in the core change log with
   its author, an application may add its own fields.
 - **No user interface.** Screens, bots and access rules belong to the application.
 
@@ -119,7 +126,7 @@ php artisan migrate
 ```
 
 Then seed the core LOVs and fields as usual (`LovsSeeder`, `FieldsSeeder`). The config
-(`--tag=mutable-content-ai-config`) sets the user model, the default driver of user settings, the memory limits and the history window.
+(`--tag=mutable-content-ai-config`) sets the user model, the default driver of user settings, the memory limits, the model prices and the history window.
 
 ## License
 
