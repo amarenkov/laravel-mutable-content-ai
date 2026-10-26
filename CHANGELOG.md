@@ -7,6 +7,8 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-26
+
 ### Added
 
 - The user's comment on a marked message: `Feedback::FIELD_COMMENT`, `Feedback::comment()`, `Feedbacks::comment()` (an empty comment removes it). Run `FieldsSeeder` after the update.
@@ -59,7 +61,8 @@ First release, very early: the API, the tables and the config will change.
 - `Prompt` and `Prompts` service: prompts registered in the code with a default text and placeholders, edited texts, versions from the core change log.
 - `FieldSchema`: tool parameters from field definitions (`allow()` limits the LOV items offered) and field values from tool arguments; `FindRecords` search tool; `TextSearch` loose word matching.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.2.0...v0.3.0
