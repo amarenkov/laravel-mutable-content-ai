@@ -13,7 +13,7 @@ use Amarenkov\MutableContentAi\Models\Run;
 
 /**
  * Marks of one user on agent messages, to review them and to correct the prompts:
- * Feedbacks::of($user)->add($reaction, $message, $run, $context, $source) / withdraw($source) / resolve() / reopen().
+ * Feedbacks::of($user)->add($reaction, $message, $run, $context, $source) / withdraw($source) / comment() / resolve() / reopen().
  * The source is the application's key of the marked message: one feedback per message, a withdrawn mark removes it.
  */
 class Feedbacks
@@ -135,6 +135,18 @@ class Feedbacks
         $note = trim((string)$note);
 
         return $this->save($feedback, [Feedback::FIELD_NOTE => $note === '' ? null : $note]);
+    }
+
+    /**
+     * The user's words on what is wrong with the message; an empty comment removes it.
+     */
+    public function comment(Feedback $feedback, ?string $comment): Feedback
+    {
+        $this->ensureOwn($feedback);
+
+        $comment = trim((string)$comment);
+
+        return $this->save($feedback, [Feedback::FIELD_COMMENT => $comment === '' ? null : $comment]);
     }
 
     public function delete(Feedback $feedback): void

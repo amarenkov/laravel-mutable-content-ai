@@ -7,6 +7,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The user's comment on a marked message: `Feedback::FIELD_COMMENT`, `Feedback::comment()`, `Feedbacks::comment()` (an empty comment removes it). Run `FieldsSeeder` after the update.
+
 ## [0.5.0] - 2026-10-21
 
 ### Added

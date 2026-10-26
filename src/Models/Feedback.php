@@ -25,8 +25,8 @@ use Amarenkov\MutableContentAi\Lovs\FeedbackStatus;
 use Amarenkov\MutableContentAi\Support\Users;
 
 /**
- * A user's mark on an agent message: the reaction, the message, the conversation around it and the run that produced
- * it. Collected to review and to correct the prompts; resolved with a note.
+ * A user's mark on an agent message: the reaction, the message, the conversation around it, the run that produced
+ * it and the user's comment on what is wrong. Collected to review and to correct the prompts; resolved with a note.
  */
 #[Table('ai.feedback')]
 #[ClassLabel('Feedback')]
@@ -60,6 +60,9 @@ class Feedback extends ModelWithFields
 
     #[CFAType(Type::TYPE_TEXT), CFALabel('Note')]
     public const FIELD_NOTE = 'note';
+
+    #[CFAType(Type::TYPE_TEXT), CFALabel('Comment')]
+    public const FIELD_COMMENT = 'comment';
 
     // static
     protected static array|bool|null $fieldDefinitions = null;
@@ -123,5 +126,10 @@ class Feedback extends ModelWithFields
     public function note(): ?string
     {
         return $this->getField(self::FIELD_NOTE);
+    }
+
+    public function comment(): ?string
+    {
+        return $this->getField(self::FIELD_COMMENT);
     }
 }

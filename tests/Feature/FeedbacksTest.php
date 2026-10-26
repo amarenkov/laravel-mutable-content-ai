@@ -66,6 +66,25 @@ class FeedbacksTest extends TestCase
         $this->assertFalse($feedbacks->withdraw('chat:1:2'));
     }
 
+    public function test_comment_on_what_is_wrong(): void
+    {
+        $feedbacks = Feedbacks::of($this->user);
+        $feedback = $feedbacks->add('👎', 'Wrong answer', source: 'chat:1:1');
+
+        $feedbacks->comment($feedback, ' Asked for the time, got the weather ');
+
+        $this->assertSame('Asked for the time, got the weather', $feedback->fresh()->comment());
+
+        $feedbacks->comment($feedback, '');
+
+        $this->assertNull($feedback->fresh()->comment());
+
+        $other = User::query()->create(['name' => 'Other', 'email' => 'other@example.com', 'password' => 'secret']);
+
+        $this->expectException(DomainException::class);
+        Feedbacks::of($other)->comment($feedback, 'Mine');
+    }
+
     public function test_other_users_do_not_see_or_change_a_feedback(): void
     {
         $feedback = Feedbacks::of($this->user)->add('👎', 'Wrong answer');

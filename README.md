@@ -91,7 +91,8 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
 - **Feedback.** `Feedbacks::of($user)->add($reaction, $message, $run, $context, $source)` keeps a user's mark on an
   agent message - a thumbs down in a chat - with the conversation around it and the run that produced it, to review
   later and correct the prompts. One feedback per source (the application's key of the message), `withdraw($source)`
-  removes a new one when the mark is taken back; `resolve($feedback, $note)`, `reopen()` and `note()` track the review.
+  removes a new one when the mark is taken back; `comment($feedback, $text)` keeps the user's words on what is wrong;
+  `resolve($feedback, $note)`, `reopen()` and `note()` track the review.
 - **Shared settings.** `Grants::of($owner)->give($user, 'telegram:15', 20)` lets another user run agents on the
   owner's settings in a conversation (and the nested ones: `telegram:15` covers `telegram:15:7`) with an own daily
   limit; `give($user)` - everywhere, as if the settings were the user's; `give(null, 'telegram:15')` - everybody in the
