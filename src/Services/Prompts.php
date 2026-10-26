@@ -102,7 +102,7 @@ class Prompts
     /**
      * Versions of the text, newest first: when, by whom (user id) and the text, null for the default.
      *
-     * @return Collection<int, array{date: \Illuminate\Support\Carbon, user_id: ?int, text: ?non-empty-string}>
+     * @return Collection<int, array{date: \Illuminate\Support\Carbon, user_id: ?int, text: ?string}>
      */
     public static function history(string $code): Collection
     {
@@ -122,7 +122,7 @@ class Prompts
                 return [
                     'date' => $entry->date,
                     'user_id' => $entry->user_id,
-                    'text' => is_string($text) && $text !== '' && trim($text) !== '' ? $text : null,
+                    'text' => is_string($text) && trim($text) !== '' ? $text : null,
                 ];
             })
             ->values();
