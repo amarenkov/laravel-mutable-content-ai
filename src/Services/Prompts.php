@@ -122,7 +122,7 @@ class Prompts
                 return [
                     'date' => $entry->date,
                     'user_id' => $entry->user_id,
-                    'text' => is_string($text) && trim($text) !== '' ? $text : null,
+                    'text' => is_string($text) && $text !== '' && trim($text) !== '' ? $text : null,
                 ];
             })
             ->values();
