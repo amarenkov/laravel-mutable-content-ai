@@ -6,4 +6,4 @@ parameters:
     paths:
         - src
     universalObjectCratesClasses:
-        - Amarenkov\MutableContent\Models\ModelWithFields
+        - Amarenkov\MutableContent\Contracts\MutableModel

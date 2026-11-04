@@ -7,6 +7,14 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-04
+
+### Changed
+
+- `FindRecords` and `FieldSchema` work with any model implementing `MutableModel`, not only subclasses of `ModelWithFields`.
+
+Requires `amarenkov/laravel-mutable-content` ^0.8.
+
 ## [0.5.1] - 2026-10-26
 
 ### Added
@@ -61,7 +69,8 @@ First release, very early: the API, the tables and the config will change.
 - `Prompt` and `Prompts` service: prompts registered in the code with a default text and placeholders, edited texts, versions from the core change log.
 - `FieldSchema`: tool parameters from field definitions (`allow()` limits the LOV items offered) and field values from tool arguments; `FindRecords` search tool; `TextSearch` loose word matching.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.3.0...v0.4.0

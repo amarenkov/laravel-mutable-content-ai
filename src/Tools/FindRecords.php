@@ -7,14 +7,16 @@ use Stringable;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Tools\Request;
 
-use Amarenkov\MutableContent\Models\ModelWithFields;
 
 use Amarenkov\MutableContentAi\Schemas\FieldSchema;
 use Amarenkov\MutableContentAi\Support\TextSearch;
+
+use Amarenkov\MutableContent\Contracts\MutableModel;
 
 /**
  * Agent tool: find records of a class by words of a title field and by exact field filters, newest first.
@@ -30,8 +32,8 @@ class FindRecords implements Tool
 
     // public
     /**
-     * @param Closure(): Builder<ModelWithFields> $query records the user may see
-     * @param class-string<ModelWithFields> $class
+     * @param Closure(): Builder<Model&MutableModel> $query records the user may see
+     * @param class-string<Model&MutableModel> $class
      * @param array<string> $filters field codes the agent may filter by
      */
     public function __construct(
@@ -77,7 +79,7 @@ class FindRecords implements Tool
         $records = $query->orderByDesc('id')->limit($words ? $this->scan : $this->limit)->get()->all();
 
         if ($words) {
-            $records = TextSearch::best($records, fn (ModelWithFields $record) => (string)$record->getField($this->titleField), $words);
+            $records = TextSearch::best($records, fn (Model&MutableModel $record) => (string)$record->getField($this->titleField), $words);
             $total = count($records);
         }
 

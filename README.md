@@ -116,7 +116,7 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
 - PHP 8.4
 - Laravel 13
 - PostgreSQL or MariaDB 10.7+ (not SQLite, not MySQL), as the core
-- `amarenkov/laravel-mutable-content` ^0.7.9, `laravel/ai` ^1.2
+- `amarenkov/laravel-mutable-content` ^0.8, `laravel/ai` ^1.2
 
 ## Installation
 

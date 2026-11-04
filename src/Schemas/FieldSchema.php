@@ -3,8 +3,10 @@
 namespace Amarenkov\MutableContentAi\Schemas;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\JsonSchema\Types\Type as SchemaType;
 
+use Amarenkov\MutableContent\Contracts\MutableModel;
 use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Domain\Field\Lov\Type;
 use Amarenkov\MutableContent\Domain\LovRegistry;
@@ -31,7 +33,7 @@ class FieldSchema
 
     // static
     /**
-     * @param class-string<ModelWithFields> $class
+     * @param class-string<Model&MutableModel> $class
      */
     public static function for(string $class, ?array $scopes = null): self
     {
