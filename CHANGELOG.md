@@ -7,6 +7,10 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-06
+
+Requires `amarenkov/laravel-mutable-content` ^0.9.
+
 ### Fixed
 
 - `Approvals::approve()` and `reject()` read the approval again under a lock: an approved action cannot run twice.
@@ -82,7 +86,8 @@ First release, very early: the API, the tables and the config will change.
 - `Prompt` and `Prompts` service: prompts registered in the code with a default text and placeholders, edited texts, versions from the core change log.
 - `FieldSchema`: tool parameters from field definitions (`allow()` limits the LOV items offered) and field values from tool arguments; `FindRecords` search tool; `TextSearch` loose word matching.
 
-[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/amarenkov/laravel-mutable-content-ai/compare/v0.4.0...v0.5.0

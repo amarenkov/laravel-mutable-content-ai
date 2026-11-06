@@ -27,7 +27,7 @@
     },
     "require": {
         "php": "^8.4",
-        "amarenkov/laravel-mutable-content": "^0.8",
+        "amarenkov/laravel-mutable-content": "^0.9",
         "laravel/ai": "^1.2"
     },
     "autoload": {
@@ -47,7 +47,7 @@
             ]
         },
         "branch-alias": {
-            "dev-main": "0.6.x-dev"
+            "dev-main": "0.7.x-dev"
         }
     },
     "require-dev": {
