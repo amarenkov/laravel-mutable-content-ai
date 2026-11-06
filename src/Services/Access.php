@@ -4,6 +4,8 @@ namespace Amarenkov\MutableContentAi\Services;
 
 use Illuminate\Contracts\Auth\Authenticatable;
 
+use Amarenkov\MutableContent\Helpers\UserHelper;
+
 use Amarenkov\MutableContentAi\Models\Grant;
 
 /**
@@ -17,7 +19,7 @@ class Access
     // static
     public static function for(Authenticatable|int $user, ?string $conversation = null): ?self
     {
-        $userId = $user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user;
+        $userId = UserHelper::id($user);
         $own = UserSettings::of($userId);
 
         if ($own->isReady()) {

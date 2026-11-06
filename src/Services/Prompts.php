@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 
 use Amarenkov\MutableContent\Helpers\LogHelper;
 use Amarenkov\MutableContent\Models\Log\Entry;
+use Amarenkov\MutableContent\Helpers\UserHelper;
 
 use Amarenkov\MutableContentAi\Models\Prompt;
 use Amarenkov\MutableContentAi\Support\PromptDefinition;
@@ -95,7 +96,7 @@ class Prompts
             return;
         }
 
-        $prompt->withLogContext()->user($user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user);
+        $prompt->withLogContext()->user(UserHelper::id($user));
         $prompt->save();
     }
 

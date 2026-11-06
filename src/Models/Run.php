@@ -21,10 +21,11 @@ use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsRequired as CFAIsRequ
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsImmutable as CFAIsImmutable;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\LovCode as CFALovCode;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\ObjectClass as CFAObjectClass;
+use Amarenkov\MutableContent\Models\Concerns\OwnedByUser;
+use Amarenkov\MutableContent\Helpers\UserHelper;
 
 use Amarenkov\MutableContentAi\Lovs\RunStatus;
 use Amarenkov\MutableContentAi\Services\Costs;
-use Amarenkov\MutableContentAi\Support\Users;
 
 /**
  * One prompt to an agent: the user's message, the tool calls with their results, the answer, the model and the tokens.
@@ -37,6 +38,8 @@ use Amarenkov\MutableContentAi\Support\Users;
 #[CommonFieldLabel]
 class Run extends ModelWithFields
 {
+    use OwnedByUser;
+
     // const
     #[CFAType(Type::TYPE_INT), CFALabel('Owner'), CFAIsRequired, CFAIsImmutable]
     public const FIELD_USER_ID = 'user_id';
@@ -89,21 +92,13 @@ class Run extends ModelWithFields
     #[CFAType(Type::TYPE_OBJECT), CFALabel('Grant'), CFAObjectClass(Grant::class), CFAIsImmutable]
     public const FIELD_GRANT_ID = 'grant_id';
 
-    // static
-    protected static array|bool|null $fieldDefinitions = null;
-
     // public
-    public function scopeOwnedBy(Builder $query, Authenticatable|int $user): Builder
-    {
-        return $query->whereField(self::FIELD_USER_ID, $user instanceof Authenticatable ? $user->getAuthIdentifier() : $user);
-    }
-
     /**
      * Runs on the user's settings: own and through the user's grants.
      */
     public function scopePaidBy(Builder $query, Authenticatable|int $user): Builder
     {
-        $userId = $user instanceof Authenticatable ? $user->getAuthIdentifier() : $user;
+        $userId = UserHelper::id($user);
 
         return $query->where(fn (Builder $query) => $query
             ->whereField(self::FIELD_PAYER_ID, $userId)
@@ -117,12 +112,12 @@ class Run extends ModelWithFields
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(Users::model(), self::FIELD_USER_ID);
+        return $this->belongsTo(UserHelper::model('mutable-content-ai'), self::FIELD_USER_ID);
     }
 
     public function payer(): BelongsTo
     {
-        return $this->belongsTo(Users::model(), self::FIELD_PAYER_ID);
+        return $this->belongsTo(UserHelper::model('mutable-content-ai'), self::FIELD_PAYER_ID);
     }
 
     /**

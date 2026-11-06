@@ -2,7 +2,6 @@
 
 namespace Amarenkov\MutableContentAi\Models;
 
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,9 +19,10 @@ use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsRequired as CFAIsRequ
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsImmutable as CFAIsImmutable;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\LovCode as CFALovCode;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\ObjectClass as CFAObjectClass;
+use Amarenkov\MutableContent\Models\Concerns\OwnedByUser;
+use Amarenkov\MutableContent\Helpers\UserHelper;
 
 use Amarenkov\MutableContentAi\Lovs\ApprovalStatus;
-use Amarenkov\MutableContentAi\Support\Users;
 
 /**
  * An agent action waiting for the user's word: the tool, its arguments and what it will do. Approved, the action is
@@ -33,6 +33,8 @@ use Amarenkov\MutableContentAi\Support\Users;
 #[CommonFieldLabel]
 class Approval extends ModelWithFields
 {
+    use OwnedByUser;
+
     // const
     #[CFAType(Type::TYPE_INT), CFALabel('Owner'), CFAIsRequired, CFAIsImmutable]
     public const FIELD_USER_ID = 'user_id';
@@ -61,15 +63,7 @@ class Approval extends ModelWithFields
     #[CFAType(Type::TYPE_TEXT), CFALabel('Result')]
     public const FIELD_RESULT = 'result';
 
-    // static
-    protected static array|bool|null $fieldDefinitions = null;
-
     // public
-    public function scopeOwnedBy(Builder $query, Authenticatable|int $user): Builder
-    {
-        return $query->whereField(self::FIELD_USER_ID, $user instanceof Authenticatable ? $user->getAuthIdentifier() : $user);
-    }
-
     public function scopePending(Builder $query): Builder
     {
         return $query->whereField(self::FIELD_STATUS, ApprovalStatus::PENDING);
@@ -77,7 +71,7 @@ class Approval extends ModelWithFields
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(Users::model(), self::FIELD_USER_ID);
+        return $this->belongsTo(UserHelper::model('mutable-content-ai'), self::FIELD_USER_ID);
     }
 
     /**

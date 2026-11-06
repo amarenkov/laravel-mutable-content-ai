@@ -7,6 +7,19 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `Approvals::approve()` and `reject()` read the approval again under a lock: an approved action cannot run twice.
+- `Settings` and `Prompt` restore a soft-deleted record with the same user or code instead of failing on the unique index.
+
+### Changed
+
+- `FieldSchema` takes the JSON type from the field type: a duration is a number now, and `values()` reads "false" as false.
+
+### Removed
+
+- `Support\Users`, replaced by the core `UserHelper`.
+
 ## [0.6.0] - 2026-11-04
 
 ### Changed

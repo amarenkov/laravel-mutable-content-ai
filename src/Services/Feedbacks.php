@@ -5,8 +5,7 @@ namespace Amarenkov\MutableContentAi\Services;
 use DateTimeInterface;
 use DomainException;
 
-use Illuminate\Contracts\Auth\Authenticatable;
-
+use Amarenkov\MutableContentAi\Services\Concerns\ForUser;
 use Amarenkov\MutableContentAi\Lovs\FeedbackStatus;
 use Amarenkov\MutableContentAi\Models\Feedback;
 use Amarenkov\MutableContentAi\Models\Run;
@@ -18,18 +17,14 @@ use Amarenkov\MutableContentAi\Models\Run;
  */
 class Feedbacks
 {
-    // static
-    public static function of(Authenticatable|int $user): self
-    {
-        return new self($user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user);
-    }
+    use ForUser;
 
+    // static
     // protected
     protected function save(Feedback $feedback, array $fields): Feedback
     {
         $feedback->fill($fields);
-        $feedback->withLogContext()->user($this->userId);
-        $feedback->save();
+        $this->saveAsUser($feedback);
 
         return $feedback;
     }
@@ -55,12 +50,6 @@ class Feedbacks
     }
 
     // public
-    public function __construct(
-        public readonly int $userId,
-    )
-    {
-    }
-
     /**
      * Keep a mark on an agent message. With a source the message is marked once: a new reaction replaces the old one.
      *
@@ -97,8 +86,7 @@ class Feedbacks
             return false;
         }
 
-        $feedback->withLogContext()->user($this->userId);
-        $feedback->delete();
+        $this->deleteAsUser($feedback);
 
         return true;
     }
@@ -153,7 +141,6 @@ class Feedbacks
     {
         $this->ensureOwn($feedback);
 
-        $feedback->withLogContext()->user($this->userId);
-        $feedback->delete();
+        $this->deleteAsUser($feedback);
     }
 }

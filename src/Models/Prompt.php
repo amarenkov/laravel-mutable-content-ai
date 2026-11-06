@@ -33,7 +33,10 @@ class Prompt extends ModelWithFields
     public const FIELD_TEXT = 'text';
 
     // static
-    protected static array|bool|null $fieldDefinitions = null;
+    public static function uniqueFieldSets(): array
+    {
+        return [[self::FIELD_CODE]];
+    }
 
     // public
     public function text(): ?string

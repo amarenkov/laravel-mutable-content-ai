@@ -4,13 +4,13 @@ namespace Amarenkov\MutableContentAi\Services;
 
 use DateTimeInterface;
 
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 use Amarenkov\MutableContent\Models\ModelWithFields;
 use Amarenkov\MutableContent\ValueObjects\Money;
 
+use Amarenkov\MutableContentAi\Services\Concerns\ForUser;
 use Amarenkov\MutableContentAi\Models\Run;
 
 /**
@@ -19,12 +19,9 @@ use Amarenkov\MutableContentAi\Models\Run;
  */
 class Spending
 {
-    // static
-    public static function of(Authenticatable|int $user): self
-    {
-        return new self($user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user);
-    }
+    use ForUser;
 
+    // static
     /**
      * Totals of the runs: costs by currency, runs of models without a price are counted in unpriced. With the models,
      * the same totals by model ('' - failed runs without a model), in the order of names.
@@ -67,12 +64,6 @@ class Spending
     }
 
     // public
-    public function __construct(
-        public readonly int $userId,
-    )
-    {
-    }
-
     /**
      * Runs paid by the user from the moment (inclusive) to the moment (exclusive), in any timezone.
      *

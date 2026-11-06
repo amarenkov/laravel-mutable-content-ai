@@ -9,6 +9,8 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
+use Amarenkov\MutableContent\Helpers\UserHelper;
+
 use Amarenkov\MutableContentAi\Models\Grant;
 use Amarenkov\MutableContentAi\Models\Run;
 
@@ -22,7 +24,7 @@ class Grants
     // static
     public static function of(Authenticatable|int $owner): self
     {
-        return new self($owner instanceof Authenticatable ? (int)$owner->getAuthIdentifier() : $owner);
+        return new self(UserHelper::id($owner));
     }
 
     /**
@@ -121,7 +123,7 @@ class Grants
      */
     public function give(Authenticatable|int|null $user, ?string $conversation = null, ?int $dailyLimit = null): Grant
     {
-        $userId = $user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user;
+        $userId = UserHelper::id($user);
         $conversation = $conversation === null || trim($conversation) === '' ? null : trim($conversation);
 
         if ($userId === null && $conversation === null) {

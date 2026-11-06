@@ -4,9 +4,9 @@ namespace Amarenkov\MutableContentAi\Services;
 
 use DomainException;
 
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 
+use Amarenkov\MutableContentAi\Services\Concerns\ForUser;
 use Amarenkov\MutableContentAi\Lovs\MemoryKind;
 use Amarenkov\MutableContentAi\Models\Memory;
 
@@ -16,12 +16,9 @@ use Amarenkov\MutableContentAi\Models\Memory;
  */
 class Memories
 {
-    // static
-    public static function of(Authenticatable|int $user): self
-    {
-        return new self($user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user);
-    }
+    use ForUser;
 
+    // static
     // protected
     protected function normalize(string $text): string
     {
@@ -29,12 +26,6 @@ class Memories
     }
 
     // public
-    public function __construct(
-        public readonly int $userId,
-    )
-    {
-    }
-
     /**
      * @return Collection<int, Memory>
      */
@@ -80,8 +71,7 @@ class Memories
             Memory::FIELD_KIND => $kind,
             Memory::FIELD_TEXT => $text,
         ]);
-        $memory->withLogContext()->user($this->userId);
-        $memory->save();
+        $this->saveAsUser($memory);
 
         return $memory;
     }
@@ -97,8 +87,7 @@ class Memories
             return false;
         }
 
-        $memory->withLogContext()->user($this->userId);
-        $memory->delete();
+        $this->deleteAsUser($memory);
 
         return true;
     }

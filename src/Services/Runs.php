@@ -18,6 +18,9 @@ use Laravel\Ai\Responses\AgentResponse;
 use Laravel\Ai\Responses\Data\ToolCall;
 use Laravel\Ai\Responses\Data\ToolResult;
 
+use Amarenkov\MutableContent\Helpers\UserHelper;
+
+use Amarenkov\MutableContentAi\Services\Concerns\WritesAsUser;
 use Amarenkov\MutableContentAi\Lovs\RunStatus;
 use Amarenkov\MutableContentAi\Models\Run;
 
@@ -31,11 +34,13 @@ use Amarenkov\MutableContentAi\Models\Run;
  */
 class Runs
 {
+    use WritesAsUser;
+
     // static
     public static function for(Authenticatable|int $user, Agent|string $agent, ?string $conversation = null): self
     {
         return new self(
-            $user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user,
+            UserHelper::id($user),
             $agent instanceof Agent ? $agent::class : $agent,
             $conversation,
         );
@@ -54,8 +59,7 @@ class Runs
             Run::FIELD_PAYER_ID => $this->access?->payerId() ?? $this->userId,
             Run::FIELD_GRANT_ID => $this->access?->grant?->id,
         ] + array_filter($fields, fn ($value) => $value !== null && $value !== ''));
-        $run->withLogContext()->user($this->userId);
-        $run->save();
+        $this->saveAsUser($run);
 
         return $run;
     }

@@ -9,6 +9,8 @@ use Illuminate\JsonSchema\Types\Type as SchemaType;
 use Amarenkov\MutableContent\Contracts\MutableModel;
 use Amarenkov\MutableContent\Domain\Field\Field;
 use Amarenkov\MutableContent\Domain\Field\Lov\Type;
+use Amarenkov\MutableContent\Domain\Field\Types\FieldType;
+use Amarenkov\MutableContent\Domain\Field\Types\FieldTypes;
 use Amarenkov\MutableContent\Domain\LovRegistry;
 use Amarenkov\MutableContent\Models\ModelWithFields;
 
@@ -19,18 +21,6 @@ use Amarenkov\MutableContent\Models\ModelWithFields;
  */
 class FieldSchema
 {
-    // const
-    protected const NUMBER_TYPES = [
-        Type::TYPE_FLOAT,
-        Type::TYPE_MONEY,
-        Type::TYPE_WEIGHT,
-        Type::TYPE_DENSITY,
-        Type::TYPE_SURFACE_DENSITY,
-        Type::TYPE_LENGTH,
-        Type::TYPE_AREA,
-        Type::TYPE_VOLUME,
-    ];
-
     // static
     /**
      * @param class-string<Model&MutableModel> $class
@@ -107,10 +97,10 @@ class FieldSchema
 
     protected function type(JsonSchema $schema, Field $field): SchemaType
     {
-        $type = match (true) {
-            $field->fieldType === Type::TYPE_INT, $field->fieldType === Type::TYPE_OBJECT => $schema->integer(),
-            $field->fieldType === Type::TYPE_BOOL => $schema->boolean(),
-            in_array($field->fieldType, self::NUMBER_TYPES, true) => $schema->number(),
+        $type = match (FieldTypes::for($field->fieldType)->kind()) {
+            FieldType::KIND_INTEGER => $schema->integer(),
+            FieldType::KIND_BOOLEAN => $schema->boolean(),
+            FieldType::KIND_NUMBER => $schema->number(),
             default => $schema->string(),
         };
 
@@ -215,11 +205,13 @@ class FieldSchema
                 continue;
             }
 
+            $kind = FieldTypes::for($field->fieldType)->kind();
+
             $value = match (true) {
-                $field->fieldType === Type::TYPE_INT, $field->fieldType === Type::TYPE_OBJECT => is_numeric($value) ? (int)$value : null,
-                $field->fieldType === Type::TYPE_BOOL => (bool)$value,
-                in_array($field->fieldType, self::NUMBER_TYPES, true) => is_numeric($value) ? $value + 0 : null,
                 $field->fieldType === Type::TYPE_LOV_ITEM => array_key_exists((string)$value, $this->lovItems($field)) ? (string)$value : null,
+                $kind === FieldType::KIND_INTEGER => is_numeric($value) ? (int)$value : null,
+                $kind === FieldType::KIND_BOOLEAN => filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+                $kind === FieldType::KIND_NUMBER => is_numeric($value) ? $value + 0 : null,
                 default => is_scalar($value) ? (string)$value : null,
             };
 

@@ -20,8 +20,8 @@ use Amarenkov\MutableContent\Attributes\FieldAttr\Common\Label as CFALabel;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsRequired as CFAIsRequired;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsImmutable as CFAIsImmutable;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\TypeSettings as CFATypeSettings;
-
-use Amarenkov\MutableContentAi\Support\Users;
+use Amarenkov\MutableContent\Models\Concerns\OwnedByUser;
+use Amarenkov\MutableContent\Helpers\UserHelper;
 
 /**
  * A user's language model settings shared with another user or with everybody in a conversation. Without a user the
@@ -33,6 +33,8 @@ use Amarenkov\MutableContentAi\Support\Users;
 #[CommonFieldLabel]
 class Grant extends ModelWithFields
 {
+    use OwnedByUser;
+
     // const
     #[CFAType(Type::TYPE_INT), CFALabel('Owner'), CFAIsRequired, CFAIsImmutable]
     public const FIELD_OWNER_ID = 'owner_id';
@@ -47,8 +49,6 @@ class Grant extends ModelWithFields
     public const FIELD_DAILY_LIMIT = 'daily_limit';
 
     // static
-    protected static array|bool|null $fieldDefinitions = null;
-
     /**
      * The conversation and the ones containing it: "telegram:15:7" => ["telegram:15:7", "telegram:15", "telegram"].
      *
@@ -67,9 +67,9 @@ class Grant extends ModelWithFields
     }
 
     // public
-    public function scopeOwnedBy(Builder $query, Authenticatable|int $user): Builder
+    public function ownerField(): string
     {
-        return $query->whereField(self::FIELD_OWNER_ID, $user instanceof Authenticatable ? $user->getAuthIdentifier() : $user);
+        return self::FIELD_OWNER_ID;
     }
 
     /**
@@ -77,7 +77,7 @@ class Grant extends ModelWithFields
      */
     public function scopeGivenTo(Builder $query, Authenticatable|int $user): Builder
     {
-        return $query->whereField(self::FIELD_USER_ID, $user instanceof Authenticatable ? $user->getAuthIdentifier() : $user);
+        return $query->whereField(self::FIELD_USER_ID, UserHelper::id($user));
     }
 
     /**
@@ -85,7 +85,7 @@ class Grant extends ModelWithFields
      */
     public function scopeAvailableTo(Builder $query, Authenticatable|int $user, ?string $conversation = null): Builder
     {
-        $userId = $user instanceof Authenticatable ? $user->getAuthIdentifier() : $user;
+        $userId = UserHelper::id($user);
 
         return $query
             ->where(fn (Builder $query) => $query->whereField(self::FIELD_USER_ID, $userId)->orWhereNull(self::FIELD_USER_ID))
@@ -97,12 +97,12 @@ class Grant extends ModelWithFields
 
     public function owner(): BelongsTo
     {
-        return $this->belongsTo(Users::model(), self::FIELD_OWNER_ID);
+        return $this->belongsTo(UserHelper::model('mutable-content-ai'), self::FIELD_OWNER_ID);
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(Users::model(), self::FIELD_USER_ID);
+        return $this->belongsTo(UserHelper::model('mutable-content-ai'), self::FIELD_USER_ID);
     }
 
     public function ownerId(): int

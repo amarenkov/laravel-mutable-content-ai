@@ -22,6 +22,19 @@ use Amarenkov\MutableContentAi\Tests\TestCase;
 
 class SchemasTest extends TestCase
 {
+    public function test_values_follow_the_kind_of_the_field_type(): void
+    {
+        $duration = new Field('spent', Type::TYPE_DURATION);
+        $duration->addUsage(new Usage('scope'));
+        $flag = new Field('done', Type::TYPE_BOOL);
+        $flag->addUsage(new Usage('scope'));
+
+        $schema = new FieldSchema(['spent' => $duration, 'done' => $flag]);
+
+        $this->assertSame(['spent' => 90, 'done' => false], $schema->values(['spent' => '90', 'done' => 'false']));
+        $this->assertSame('number', $schema->build(new JsonSchemaTypeFactory())['spent']->toArray()['type']);
+    }
+
     // protected
     protected function schema(FieldSchema $fieldSchema): array
     {

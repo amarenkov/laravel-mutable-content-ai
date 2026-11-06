@@ -5,12 +5,12 @@ namespace Amarenkov\MutableContentAi\Services;
 use DateTimeInterface;
 use DomainException;
 
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 use Amarenkov\MutableContent\ValueObjects\Money;
 
+use Amarenkov\MutableContentAi\Services\Concerns\ForUser;
 use Amarenkov\MutableContentAi\Lovs\BalanceEntryKind;
 use Amarenkov\MutableContentAi\Models\BalanceEntry;
 use Amarenkov\MutableContentAi\Models\Run;
@@ -22,12 +22,9 @@ use Amarenkov\MutableContentAi\Models\Run;
  */
 class Balances
 {
-    // static
-    public static function of(Authenticatable|int $user): self
-    {
-        return new self($user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user);
-    }
+    use ForUser;
 
+    // static
     // protected
     protected function add(string $kind, Money $amount, ?DateTimeInterface $at, ?string $note): BalanceEntry
     {
@@ -39,19 +36,12 @@ class Balances
             BalanceEntry::FIELD_AT => $at ?? now(),
             BalanceEntry::FIELD_NOTE => $note === null ? null : trim($note),
         ], fn ($value) => $value !== null && $value !== ''));
-        $entry->withLogContext()->user($this->userId);
-        $entry->save();
+        $this->saveAsUser($entry);
 
         return $entry;
     }
 
     // public
-    public function __construct(
-        public readonly int $userId,
-    )
-    {
-    }
-
     /**
      * Money put on the account: an amount above zero.
      */
@@ -86,8 +76,7 @@ class Balances
     public function delete(BalanceEntry|int $entry): void
     {
         $entry = $this->find($entry instanceof BalanceEntry ? $entry->id : $entry);
-        $entry->withLogContext()->user($this->userId);
-        $entry->delete();
+        $this->deleteAsUser($entry);
     }
 
     /**
@@ -116,14 +105,13 @@ class Balances
             $actual = $entries->first(fn (BalanceEntry $entry) => !$entry->isTopUp());
             $since = $actual?->at();
 
-            $topUps = $entries
+            $topUps = Money::sum($entries
                 ->filter(fn (BalanceEntry $entry) => $entry->isTopUp() && ($since === null || $entry->at() > $since))
-                ->reduce(fn (Money $sum, BalanceEntry $entry) => $sum->add($entry->amount()), Money::zero($currency));
+                ->map(fn (BalanceEntry $entry) => $entry->amount())) ?? Money::zero($currency);
 
-            $spent = Spending::of($this->userId)->runs($since)
+            $spent = Money::sum(Spending::of($this->userId)->runs($since)
                 ->map(fn (Run $run) => $run->cost())
-                ->filter(fn (?Money $cost) => $cost?->currency === $currency)
-                ->reduce(fn (Money $sum, Money $cost) => $sum->add($cost), Money::zero($currency));
+                ->filter(fn (?Money $cost) => $cost?->currency === $currency)) ?? Money::zero($currency);
 
             $result[$currency] = [
                 'balance' => ($actual?->amount() ?? Money::zero($currency))->add($topUps)->subtract($spent),

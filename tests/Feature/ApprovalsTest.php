@@ -90,6 +90,25 @@ class ApprovalsTest extends TestCase
         $this->assertCount(1, Memories::of($this->user)->all());
     }
 
+    public function test_a_stale_approval_cannot_be_performed_twice(): void
+    {
+        $memory = Memories::of($this->user)->remember('Twice');
+        Helper::fake([new ToolCall('call-1', 'forget', ['id' => $memory->id]), 'Waiting.']);
+
+        new Helper($this->user, 'chat:1', confirm: true)->prompt('Forget it');
+
+        $approvals = Approvals::of($this->user, 'chat:1');
+        $stale = Approval::query()->ownedBy($this->user)->sole();
+        $tool = new Forget($this->user);
+
+        $approvals->approve(Approval::query()->findOrFail($stale->id), $tool);
+
+        $this->assertTrue($stale->isPending());
+        $this->expectException(DomainException::class);
+
+        $approvals->approve($stale, $tool);
+    }
+
     public function test_without_approvals_the_tool_acts_at_once(): void
     {
         $memory = Memories::of($this->user)->remember('Short');

@@ -4,11 +4,11 @@ namespace Amarenkov\MutableContentAi\Services;
 
 use LogicException;
 
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Carbon;
 
 use Laravel\Ai\Ai;
 
+use Amarenkov\MutableContentAi\Services\Concerns\ForUser;
 use Amarenkov\MutableContentAi\Models\Run;
 use Amarenkov\MutableContentAi\Models\Settings;
 
@@ -19,25 +19,16 @@ use Amarenkov\MutableContentAi\Models\Settings;
  */
 class UserSettings
 {
+    use ForUser;
+
     // const
     public const PROVIDER_PREFIX = 'mutable_content_ai_user_';
 
     // static
-    public static function of(Authenticatable|int $user): self
-    {
-        return new self($user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user);
-    }
-
     // protected
     protected ?Settings $record = null;
 
     // public
-    public function __construct(
-        public readonly int $userId,
-    )
-    {
-    }
-
     public function record(): ?Settings
     {
         return $this->record ??= Settings::query()->ownedBy($this->userId)->first();
@@ -60,8 +51,7 @@ class UserSettings
         $settings->fill($values);
 
         if ($settings->isDirty() || !$settings->exists) {
-            $settings->withLogContext()->user($this->userId);
-            $settings->save();
+            $this->saveAsUser($settings);
         }
 
         return $this->record = $settings;
@@ -76,8 +66,7 @@ class UserSettings
         }
 
         $settings->setField(Settings::FIELD_API_KEY, null);
-        $settings->withLogContext()->user($this->userId);
-        $settings->save();
+        $this->saveAsUser($settings);
     }
 
     /**

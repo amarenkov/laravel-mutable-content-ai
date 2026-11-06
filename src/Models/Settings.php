@@ -2,9 +2,7 @@
 
 namespace Amarenkov\MutableContentAi\Models;
 
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Attributes\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use Amarenkov\MutableContent\Domain\Field\Lov\Type;
@@ -20,8 +18,8 @@ use Amarenkov\MutableContent\Attributes\FieldAttr\Common\Label as CFALabel;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsRequired as CFAIsRequired;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\IsImmutable as CFAIsImmutable;
 use Amarenkov\MutableContent\Attributes\FieldAttr\Common\TypeSettings as CFATypeSettings;
-
-use Amarenkov\MutableContentAi\Support\Users;
+use Amarenkov\MutableContent\Models\Concerns\OwnedByUser;
+use Amarenkov\MutableContent\Helpers\UserHelper;
 
 /**
  * Language model settings of a user: the provider with the user's own key, the model and the daily limit.
@@ -31,6 +29,8 @@ use Amarenkov\MutableContentAi\Support\Users;
 #[CommonFieldLabel]
 class Settings extends ModelWithFields
 {
+    use OwnedByUser;
+
     // const
     #[CFAType(Type::TYPE_INT), CFALabel('Owner'), CFAIsRequired, CFAIsImmutable]
     public const FIELD_USER_ID = 'user_id';
@@ -54,17 +54,15 @@ class Settings extends ModelWithFields
     public const FIELD_DAILY_LIMIT = 'daily_limit';
 
     // static
-    protected static array|bool|null $fieldDefinitions = null;
-
-    // public
-    public function scopeOwnedBy(Builder $query, Authenticatable|int $user): Builder
+    public static function uniqueFieldSets(): array
     {
-        return $query->whereField(self::FIELD_USER_ID, $user instanceof Authenticatable ? $user->getAuthIdentifier() : $user);
+        return [[self::FIELD_USER_ID]];
     }
 
+    // public
     public function user(): BelongsTo
     {
-        return $this->belongsTo(Users::model(), self::FIELD_USER_ID);
+        return $this->belongsTo(UserHelper::model('mutable-content-ai'), self::FIELD_USER_ID);
     }
 
     public function isEnabled(): bool

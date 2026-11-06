@@ -7,6 +7,9 @@ use DomainException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
 
+use Amarenkov\MutableContent\Helpers\UserHelper;
+
+use Amarenkov\MutableContentAi\Services\Concerns\WritesAsUser;
 use Amarenkov\MutableContentAi\Contracts\NeedsApproval;
 use Amarenkov\MutableContentAi\Lovs\ApprovalStatus;
 use Amarenkov\MutableContentAi\Models\Approval;
@@ -19,18 +22,19 @@ use Amarenkov\MutableContentAi\Models\Run;
  */
 class Approvals
 {
+    use WritesAsUser;
+
     // static
     public static function of(Authenticatable|int $user, ?string $conversation = null): self
     {
-        return new self($user instanceof Authenticatable ? (int)$user->getAuthIdentifier() : $user, $conversation);
+        return new self(UserHelper::id($user), $conversation);
     }
 
     // protected
     protected function resolve(Approval $approval, string $status, string $result): void
     {
         $approval->fill([Approval::FIELD_STATUS => $status, Approval::FIELD_RESULT => $result]);
-        $approval->withLogContext()->user($this->userId);
-        $approval->save();
+        $this->saveAsUser($approval);
 
         $run = $approval->run;
         $callId = $approval->getField(Approval::FIELD_TOOL_CALL_ID);
@@ -46,8 +50,7 @@ class Approvals
         );
 
         $run->fill([Run::FIELD_TOOL_CALLS => json_encode($calls, JSON_UNESCAPED_UNICODE)]);
-        $run->withLogContext()->user($this->userId);
-        $run->save();
+        $this->saveAsUser($run);
     }
 
     protected function ensurePending(Approval $approval): void
@@ -55,6 +58,22 @@ class Approvals
         if ((int)$approval->getField(Approval::FIELD_USER_ID) !== $this->userId || !$approval->isPending()) {
             throw new DomainException(__('mutable-content-ai::ai.approval_not_pending'));
         }
+    }
+
+    /**
+     * The approval read again and locked until the end of the transaction: two decisions at once must not both pass.
+     */
+    protected function lockPending(Approval $approval): Approval
+    {
+        $locked = Approval::query()->whereKey($approval->getKey())->lockForUpdate()->first();
+
+        if (!$locked) {
+            throw new DomainException(__('mutable-content-ai::ai.approval_not_pending'));
+        }
+
+        $this->ensurePending($locked);
+
+        return $locked;
     }
 
     // public
@@ -77,8 +96,7 @@ class Approvals
             Approval::FIELD_SUMMARY => $summary,
             Approval::FIELD_STATUS => ApprovalStatus::PENDING,
         ], fn ($value) => $value !== null));
-        $approval->withLogContext()->user($this->userId);
-        $approval->save();
+        $this->saveAsUser($approval);
 
         return $approval;
     }
@@ -103,19 +121,28 @@ class Approvals
             throw new DomainException(__('mutable-content-ai::ai.approval_wrong_tool'));
         }
 
-        return DB::transaction(function () use ($approval, $tool) {
-            $result = $tool->performApproved($approval);
-            $this->resolve($approval, ApprovalStatus::APPROVED, $result);
+        $result = DB::transaction(function () use ($approval, $tool) {
+            $locked = $this->lockPending($approval);
+
+            $result = $tool->performApproved($locked);
+
+            $this->resolve($locked, ApprovalStatus::APPROVED, $result);
 
             return $result;
         });
+
+        $approval->refresh();
+
+        return $result;
     }
 
     public function reject(Approval $approval, ?string $reason = null): void
     {
         $this->ensurePending($approval);
 
-        $this->resolve($approval, ApprovalStatus::REJECTED, $reason ?? __('mutable-content-ai::ai.approval_rejected_default'));
+        DB::transaction(fn () => $this->resolve($this->lockPending($approval), ApprovalStatus::REJECTED, $reason ?? __('mutable-content-ai::ai.approval_rejected_default')));
+
+        $approval->refresh();
     }
 
     /**
@@ -139,8 +166,7 @@ class Approvals
         foreach ($approvals as $approval) {
             if (in_array($approval->getField(Approval::FIELD_TOOL_CALL_ID), $callIds, true)) {
                 $approval->fill([Approval::FIELD_RUN_ID => $run->id]);
-                $approval->withLogContext()->user($this->userId);
-                $approval->save();
+                $this->saveAsUser($approval);
             }
         }
     }
