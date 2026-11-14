@@ -7,6 +7,19 @@ and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `GrantConsent` and `Consents::of($user)->accept()` / `decline()` / `isAccepted()` / `isDeclined()` / `isUndecided()`:
+  the decision of a user on a grant offered to them. Migration `extend_ai_tables_with_grant_consents`.
+- `Access::offerFor($user, $conversation)`: the grant to ask the user about when there is no access.
+- `UserSettings::endpoint()`: the driver and the URL the requests go to.
+
+### Changed
+
+- `Access::for()` uses a grant only after the user accepted it, and only while the owner's settings point to the
+  endpoint accepted. Existing grants stop working until their users accept them: somebody else's model sees the
+  user's requests and data and answers with actions in the user's name.
+
 ## [0.7.0] - 2026-11-06
 
 Requires `amarenkov/laravel-mutable-content` ^0.9.

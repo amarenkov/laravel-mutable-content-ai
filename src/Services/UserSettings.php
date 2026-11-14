@@ -134,6 +134,22 @@ class UserSettings
     }
 
     /**
+     * Where the requests go: the driver and the URL ("openai https://llm.example.com/v1"); the driver alone for its
+     * default URL. Grant consents hold for one endpoint.
+     */
+    public function endpoint(): string
+    {
+        $settings = $this->record();
+        $driver = $settings?->getField(Settings::FIELD_DRIVER);
+        $url = $settings?->getField(Settings::FIELD_URL);
+
+        $driver = is_string($driver) && $driver !== '' ? $driver : (string)config('mutable-content-ai.settings.driver');
+        $url = is_string($url) ? rtrim(trim($url), '/') : '';
+
+        return trim($driver.' '.$url);
+    }
+
+    /**
      * Name of the provider built from the settings in this process, to return from the provider() method of an agent.
      */
     public function provider(): string

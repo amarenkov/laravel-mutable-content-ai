@@ -16,6 +16,7 @@ use Amarenkov\MutableContentAi\Models\Approval;
 use Amarenkov\MutableContentAi\Models\BalanceEntry;
 use Amarenkov\MutableContentAi\Models\Feedback;
 use Amarenkov\MutableContentAi\Models\Grant;
+use Amarenkov\MutableContentAi\Models\GrantConsent;
 use Amarenkov\MutableContentAi\Models\Memory;
 use Amarenkov\MutableContentAi\Models\Prompt;
 use Amarenkov\MutableContentAi\Models\Run;
@@ -39,6 +40,7 @@ class MutableContentAiServiceProvider extends ServiceProvider
                 ->add(Settings::class)
                 ->add(Feedback::class)
                 ->add(Grant::class)
+                ->add(GrantConsent::class)
                 ->add(BalanceEntry::class);
         });
 

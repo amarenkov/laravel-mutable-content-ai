@@ -99,7 +99,11 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
   conversation. `moveTo()`, `setDailyLimit()`, `revoke()`. `Access::for($user, $conversation)` picks the settings: own
   ready ones first, then a grant within its limit and the owner's; the agent returns `$access->provider()` and the
   journal keeps the payer and the grant (`Runs::for(...)->using($access)`), so the owner's daily limit counts the runs
-  of everybody on the owner's key.
+  of everybody on the owner's key. A grant works only after the user accepted it: the owner's model sees the user's
+  requests and data and answers with actions in the user's name. `Access::offerFor($user, $conversation)` tells the
+  grant to ask the user about, `Consents::of($user)->accept($grant)` / `decline($grant)` keep the answer - for everybody
+  in a conversation each user answers for themselves. An acceptance holds for the endpoint of the owner's settings
+  (`UserSettings::endpoint()`: the driver and the URL); pointed elsewhere, the grant is offered again.
 - **Costs and balance.** The journal keeps the tokens read from and written to a prompt cache. With the prices of
   `mutable-content-ai.prices` (per model, per million tokens, in the provider's currency:
   `'claude-haiku-5-5' => ['currency' => 'USD', 'input' => 0.1, 'output' => 0.5, 'cache_read' => 0.01, 'cache_write' => 0.125]`)
@@ -107,7 +111,7 @@ $agent->runs()->record('Remember: Pete is @petrov', $response);
   the user by currency and by model. Providers do not tell the balance by the API key, so `Balances::of($user)` estimates it:
   `topUp($money)` and `setActual($money)` (the balance seen at the provider) keep entries, `remaining()` is the latest
   actual balance of each currency plus the top-ups after it minus the costs after it.
-- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`, `Settings`, `Feedback`, `Grant`, `BalanceEntry`) in the `ai` schema: every change lands in the core change log with
+- Models with mutable fields (`Memory`, `Run`, `Approval`, `Prompt`, `Settings`, `Feedback`, `Grant`, `GrantConsent`, `BalanceEntry`) in the `ai` schema: every change lands in the core change log with
   its author, an application may add its own fields.
 - **No user interface.** Screens, bots and access rules belong to the application.
 

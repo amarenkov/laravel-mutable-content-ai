@@ -11,6 +11,7 @@ use Amarenkov\MutableContentAi\Models\Grant;
 use Amarenkov\MutableContentAi\Models\Run;
 use Amarenkov\MutableContentAi\Models\Settings;
 use Amarenkov\MutableContentAi\Services\Access;
+use Amarenkov\MutableContentAi\Services\Consents;
 use Amarenkov\MutableContentAi\Services\Grants;
 use Amarenkov\MutableContentAi\Services\UserSettings;
 
@@ -40,6 +41,13 @@ class GrantsTest extends TestCase
         return new Helper($user, $conversation)->runs()->using($access)->failed('Hi', new RuntimeException('Connection reset'), 10);
     }
 
+    protected function accept(User $user, Grant ...$grants): void
+    {
+        foreach ($grants as $grant) {
+            Consents::of($user)->accept($grant);
+        }
+    }
+
     // public
     public function test_a_grant_is_given_once_per_user_and_conversation(): void
     {
@@ -65,7 +73,7 @@ class GrantsTest extends TestCase
 
     public function test_own_ready_settings_come_first(): void
     {
-        Grants::of($this->friend)->give($this->user);
+        $this->accept($this->user, Grants::of($this->friend)->give($this->user));
         UserSettings::of($this->friend)->save([Settings::FIELD_IS_ENABLED => true, Settings::FIELD_API_KEY => 'sk-friend']);
 
         $access = Access::for($this->user, 'chat:1');
@@ -79,6 +87,7 @@ class GrantsTest extends TestCase
     {
         $grants = Grants::of($this->user);
         $grant = $grants->give($this->friend, 'chat:1');
+        $this->accept($this->friend, $grant);
 
         $access = Access::for($this->friend, 'chat:1:7');
 
@@ -105,7 +114,9 @@ class GrantsTest extends TestCase
 
     public function test_a_grant_for_everybody_in_the_conversation(): void
     {
-        Grants::of($this->user)->give(null, 'chat:1');
+        $grant = Grants::of($this->user)->give(null, 'chat:1');
+        $this->accept($this->friend, $grant);
+        $this->accept($this->stranger, $grant);
 
         $this->assertTrue(Access::for($this->friend, 'chat:1')->grant->isForEverybody());
         $this->assertTrue(Access::for($this->stranger, 'chat:1')->isShared());
@@ -115,7 +126,7 @@ class GrantsTest extends TestCase
 
     public function test_a_grant_needs_ready_settings_of_the_owner(): void
     {
-        Grants::of($this->user)->give($this->friend);
+        $this->accept($this->friend, Grants::of($this->user)->give($this->friend));
 
         UserSettings::of($this->user)->save([Settings::FIELD_IS_ENABLED => false]);
 
@@ -142,6 +153,8 @@ class GrantsTest extends TestCase
         $grants = Grants::of($this->user);
         $personal = $grants->give($this->friend, 'chat:1', 1);
         $everybody = $grants->give(null, 'chat:1');
+        $this->accept($this->friend, $personal, $everybody);
+        $this->accept($this->stranger, $everybody);
 
         $access = Access::for($this->friend, 'chat:1');
         $this->assertSame($personal->id, $access->grant->id);
